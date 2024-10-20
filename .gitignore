@@ -1,0 +1,69 @@
+# .gitignore
+
+## Ignore Visual Studio files
+.vs/
+.vscode/
+*.suo
+*.ntvs*
+*.nproj
+*.user
+*.userosscache
+*.sln.docstates
+
+## Ignore build results
+# /bin/
+# /obj/
+bin/
+obj/
+Debug/
+Release/
+x64/
+x86/
+ARM/
+AnyCPU/
+
+## Ignore NuGet packages
+*.nupkg
+packages/
+**/packages/
+
+## Ignore test results
+TestResults/
+**/TestResults/
+
+## Ignore ReSharper files
+*.resharper
+*_ReSharper.*
+*.DotSettings
+
+## Ignore common files
+*.user
+*.sln.docstates
+*.tmp
+*.bak
+*.cache
+
+## Ignore sln and csproj files
+*.suo
+*.csproj
+*.vbproj
+*.vcxproj
+*.vcxproj.filters
+*.sln
+
+## Ignore src and test directories (only if you want to ignore the whole directory)
+#src/
+#test/
+
+## Ignore specific files
+App_Data/
+Content/
+*.publishsettings
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+*.pubxml
+*.publishxml
+*.vcxproj.filters
+*.vspscc
+*.vssscc

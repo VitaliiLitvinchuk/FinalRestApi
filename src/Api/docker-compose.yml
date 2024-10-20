@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: FinalProjectDb
+    environment:
+      POSTGRES_USER: final_project
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: FinalProject
+    ports:
+      - "5555:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+volumes:
+  db_data:
