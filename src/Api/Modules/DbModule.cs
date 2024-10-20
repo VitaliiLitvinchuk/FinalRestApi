@@ -13,7 +13,7 @@ public static class DbModule
         var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
         if (bool.Parse(config["AllowSeeders"]!))
         {
-
+            await app.SeedAsync();
         }
     }
 }
