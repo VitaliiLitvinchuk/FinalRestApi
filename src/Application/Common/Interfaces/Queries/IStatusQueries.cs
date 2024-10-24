@@ -7,4 +7,5 @@ public interface IStatusQueries
 {
     public Task<Option<Status>> GetByIdAsync(StatusId id, CancellationToken cancellation);
     public Task<IEnumerable<Status>> GetAllAsync(CancellationToken cancellation);
+    public Task<Option<Status>> GetByNameAsync(string name, CancellationToken cancellation);
 }

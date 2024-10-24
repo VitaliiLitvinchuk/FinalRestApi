@@ -45,6 +45,16 @@ public class StatusRepository(ApplicationDbContext context) : IStatusRepository,
         return status is null ? Option.None<Status>() : Option.Some(status);
     }
 
+    public async Task<Option<Status>> GetByNameAsync(string name, CancellationToken cancellation)
+    {
+        var status = await Statuses
+            .Include(x => x.UserAssignments)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Name == name, cancellation);
+
+        return status is null ? Option.None<Status>() : Option.Some(status);
+    }
+
     public async Task<Status> Update(Status status, CancellationToken cancellation)
     {
         Statuses.Update(status);
