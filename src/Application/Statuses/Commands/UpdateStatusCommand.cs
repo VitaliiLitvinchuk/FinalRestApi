@@ -9,8 +9,8 @@ namespace Application.Statuses.Commands;
 
 public record UpdateStatusCommand : IRequest<Result<Status, StatusException>>
 {
-    public required Guid Id { get; set; }
-    public required string Name { get; set; }
+    public required Guid Id { get; init; }
+    public required string Name { get; init; }
 }
 
 public class UpdateStatusCommandHandler(IStatusRepository repository, IStatusQueries queries) : IRequestHandler<UpdateStatusCommand, Result<Status, StatusException>>

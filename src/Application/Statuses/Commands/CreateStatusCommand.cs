@@ -10,7 +10,7 @@ namespace Application.Statuses.Commands;
 
 public record CreateStatusCommand : IRequest<Result<Status, StatusException>>
 {
-    public required string Name { get; set; }
+    public required string Name { get; init; }
 }
 
 public class CreateStatusCommandHandler(IStatusRepository repository, IStatusQueries queries) : IRequestHandler<CreateStatusCommand, Result<Status, StatusException>>
