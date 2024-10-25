@@ -45,6 +45,16 @@ public class UserGroupRoleRepository(ApplicationDbContext context) : IUserGroupR
         return userGroupRole is null ? Option.None<UserGroupRole>() : Option.Some(userGroupRole);
     }
 
+    public async Task<Option<UserGroupRole>> GetByNameAsync(string name, CancellationToken cancellation)
+    {
+        var userGroupRole = await UserGroupRoles
+            .Include(x => x.UserGroups)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Name == name, cancellation);
+
+        return userGroupRole is null ? Option.None<UserGroupRole>() : Option.Some(userGroupRole);
+    }
+
     public async Task<UserGroupRole> Update(UserGroupRole userGroupRole, CancellationToken cancellation)
     {
         UserGroupRoles.Update(userGroupRole);
