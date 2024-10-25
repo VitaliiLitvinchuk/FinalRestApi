@@ -12,7 +12,6 @@ public class UpdateStatusCommandValidator : AbstractValidator<UpdateStatusComman
 
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MinimumLength(5)
             .MaximumLength(255);
     }
 }

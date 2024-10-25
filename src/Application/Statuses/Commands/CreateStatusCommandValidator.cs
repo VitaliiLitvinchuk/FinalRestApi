@@ -8,7 +8,6 @@ public class CreateStatusCommandValidator : AbstractValidator<CreateStatusComman
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MinimumLength(5)
             .MaximumLength(255);
     }
 }
