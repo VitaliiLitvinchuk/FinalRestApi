@@ -4,7 +4,6 @@ using Application.Common.Interfaces.Repositories;
 using Application.UserGroupRoles.Exceptions;
 using Domain.UserGroupRoles;
 using MediatR;
-using Optional.Unsafe;
 
 namespace Application.UserGroupRoles.Commands;
 
@@ -17,14 +16,24 @@ public class CreateUserGroupRoleCommandHandler(IUserGroupRoleRepository reposito
 {
     public async Task<Result<UserGroupRole, UserGroupRoleException>> Handle(CreateUserGroupRoleCommand request, CancellationToken cancellationToken)
     {
-        var result = (await queries.GetByNameAsync(request.Name, cancellationToken)).ValueOrDefault();
+        var result = await queries.GetByNameAsync(request.Name, cancellationToken);
 
-        if (result is not null)
-            return new UserGroupRoleAlreadyExistsException(result.Id, request.Name);
+        return await result.Match(
+            userGroupRole => Task.FromResult<Result<UserGroupRole, UserGroupRoleException>>(new UserGroupRoleAlreadyExistsException(userGroupRole.Id, request.Name)),
+            async () => await CreateEntity(UserGroupRole.New(UserGroupRoleId.New(), request.Name), cancellationToken)
+        );
+    }
 
-        var userGroupRole = UserGroupRole.New(UserGroupRoleId.New(), request.Name);
-
-        return await repository.Create(userGroupRole, cancellationToken);
+    private async Task<Result<UserGroupRole, UserGroupRoleException>> CreateEntity(UserGroupRole entity, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await repository.Create(entity, cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            return new UserGroupRoleUnknownException(entity.Id, exception);
+        }
     }
 }
 

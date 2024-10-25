@@ -4,7 +4,6 @@ using Application.Common.Interfaces.Repositories;
 using Application.UserRoles.Exceptions;
 using Domain.UserRoles;
 using MediatR;
-using Optional.Unsafe;
 
 namespace Application.UserRoles.Commands;
 
@@ -17,13 +16,23 @@ public class CreateUserRoleCommandHandler(IUserRoleRepository repository, IUserR
 {
     public async Task<Result<UserRole, UserRoleException>> Handle(CreateUserRoleCommand request, CancellationToken cancellationToken)
     {
-        var result = (await queries.GetByNameAsync(request.Name, cancellationToken)).ValueOrDefault();
+        var result = await queries.GetByNameAsync(request.Name, cancellationToken);
 
-        if (result is not null)
-            return new UserRoleAlreadyExistsException(result.Id, request.Name);
+        return await result.Match(
+            userRole => Task.FromResult<Result<UserRole, UserRoleException>>(new UserRoleAlreadyExistsException(userRole.Id, request.Name)),
+            async () => await CreateEntity(UserRole.New(UserRoleId.New(), request.Name), cancellationToken)
+        );
+    }
 
-        var userRole = UserRole.New(UserRoleId.New(), request.Name);
-
-        return await repository.Create(userRole, cancellationToken);
+    private async Task<Result<UserRole, UserRoleException>> CreateEntity(UserRole entity, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await repository.Create(entity, cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            return new UserRoleUnknownException(entity.Id, exception);
+        }
     }
 }

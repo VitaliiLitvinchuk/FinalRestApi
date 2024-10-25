@@ -4,7 +4,6 @@ using Application.Common.Interfaces.Repositories;
 using Application.Statuses.Exceptions;
 using Domain.Statuses;
 using MediatR;
-using Optional.Unsafe;
 
 namespace Application.Statuses.Commands;
 
@@ -17,13 +16,23 @@ public class CreateStatusCommandHandler(IStatusRepository repository, IStatusQue
 {
     public async Task<Result<Status, StatusException>> Handle(CreateStatusCommand request, CancellationToken cancellationToken)
     {
-        var result = (await queries.GetByNameAsync(request.Name, cancellationToken)).ValueOrDefault();
+        var result = await queries.GetByNameAsync(request.Name, cancellationToken);
 
-        if (result is not null)
-            return new StatusAlreadyExistsException(result.Id, request.Name);
+        return await result.Match(
+            status => Task.FromResult<Result<Status, StatusException>>(new StatusAlreadyExistsException(status.Id, request.Name)),
+            async () => await CreateEntity(Status.New(StatusId.New(), request.Name), cancellationToken)
+        );
+    }
 
-        var status = Status.New(StatusId.New(), request.Name);
-
-        return await repository.Create(status, cancellationToken);
+    private async Task<Result<Status, StatusException>> CreateEntity(Status entity, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await repository.Create(entity, cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            return new StatusUnknownException(entity.Id, exception);
+        }
     }
 }

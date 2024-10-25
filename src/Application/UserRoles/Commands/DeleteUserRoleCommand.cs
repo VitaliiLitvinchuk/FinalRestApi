@@ -4,7 +4,6 @@ using Application.Common.Interfaces.Repositories;
 using Application.UserRoles.Exceptions;
 using Domain.UserRoles;
 using MediatR;
-using Optional.Unsafe;
 
 namespace Application.UserRoles.Commands;
 
@@ -19,14 +18,29 @@ public class DeleteUserRoleCommandHandler(IUserRoleRepository repository, IUserR
     {
         var id = new UserRoleId(request.Id);
 
-        var userRole = (await queries.GetByIdAsync(id, cancellationToken)).ValueOrDefault();
+        var result = await queries.GetByIdAsync(id, cancellationToken);
 
-        if (userRole is null)
-            return new UserRoleNotFoundException(id);
+        return await result.Match(
+            async userRole =>
+            {
+                if (userRole.Users.Count != 0)
+                    return new UserRoleHasRelationsException(id);
 
-        if (userRole.Users.Count != 0)
-            return new UserRoleHasRelationsException(id);
+                return await DeleteEntity(userRole, cancellationToken);
+            },
+            () => Task.FromResult<Result<UserRole, UserRoleException>>(new UserRoleNotFoundException(id))
+        );
+    }
 
-        return await repository.Delete(userRole, cancellationToken);
+    private async Task<Result<UserRole, UserRoleException>> DeleteEntity(UserRole entity, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await repository.Delete(entity, cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            return new UserRoleUnknownException(entity.Id, exception);
+        }
     }
 }

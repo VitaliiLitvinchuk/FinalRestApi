@@ -1,11 +1,9 @@
-using System;
 using Application.Common;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Application.UserGroupRoles.Exceptions;
 using Domain.UserGroupRoles;
 using MediatR;
-using Optional.Unsafe;
 
 namespace Application.UserGroupRoles.Commands;
 
@@ -20,14 +18,29 @@ public class DeleteUserGroupRoleCommandHandler(IUserGroupRoleRepository reposito
     {
         var id = new UserGroupRoleId(request.Id);
 
-        var userGroupRole = (await queries.GetByIdAsync(id, cancellationToken)).ValueOrDefault();
+        var userGroupRole = await queries.GetByIdAsync(id, cancellationToken);
 
-        if (userGroupRole is null)
-            return new UserGroupRoleNotFoundException(id);
+        return await userGroupRole.Match(
+            async userGroupRole =>
+            {
+                if (userGroupRole.UserGroups.Count != 0)
+                    return new UserGroupRoleHasRelationsException(id);
 
-        if (userGroupRole.UserGroups.Count != 0)
-            return new UserGroupRoleHasRelationsException(id);
+                return await DeleteEntity(userGroupRole, cancellationToken);
+            },
+            () => Task.FromResult<Result<UserGroupRole, UserGroupRoleException>>(new UserGroupRoleNotFoundException(id))
+        );
+    }
 
-        return await repository.Delete(userGroupRole, cancellationToken);
+    private async Task<Result<UserGroupRole, UserGroupRoleException>> DeleteEntity(UserGroupRole entity, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await repository.Delete(entity, cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            return new UserGroupRoleUnknownException(entity.Id, exception);
+        }
     }
 }

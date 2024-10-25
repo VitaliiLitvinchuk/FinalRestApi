@@ -4,7 +4,6 @@ using Application.Common.Interfaces.Repositories;
 using Application.UserRoles.Exceptions;
 using Domain.UserRoles;
 using MediatR;
-using Optional.Unsafe;
 
 namespace Application.UserRoles.Commands;
 
@@ -18,18 +17,20 @@ public class UpdateUserRoleCommandHandler(IUserRoleRepository repository, IUserR
 {
     public async Task<Result<UserRole, UserRoleException>> Handle(UpdateUserRoleCommand request, CancellationToken cancellationToken)
     {
-        var result = (await queries.GetByNameAsync(request.Name, cancellationToken)).ValueOrDefault();
+        var result = await queries.GetByNameAsync(request.Name, cancellationToken);
 
-        if (result is not null)
-            return new UserRoleAlreadyExistsException(result.Id, request.Name);
+        return await result.Match(
+            userRole => Task.FromResult<Result<UserRole, UserRoleException>>(new UserRoleAlreadyExistsException(userRole.Id, request.Name)),
+            async () =>
+            {
+                var id = new UserRoleId(request.Id);
 
-        var id = new UserRoleId(request.Id);
-
-        var exist = await queries.GetByIdAsync(id, cancellationToken);
-
-        return await exist.Match(
-            async userRole => await UpdateEntity(userRole, request.Name, cancellationToken),
-            () => Task.FromResult<Result<UserRole, UserRoleException>>(new UserRoleNotFoundException(id))
+                var result = await queries.GetByIdAsync(id, cancellationToken);
+                return await result.Match(
+                    async userRole => await UpdateEntity(userRole, request.Name, cancellationToken),
+                    () => Task.FromResult<Result<UserRole, UserRoleException>>(new UserRoleNotFoundException(id))
+                );
+            }
         );
     }
 
@@ -41,8 +42,8 @@ public class UpdateUserRoleCommandHandler(IUserRoleRepository repository, IUserR
         try
         {
             entity.UpdateDetails(name);
-            await repository.Update(entity, cancellationToken);
-            return entity;
+
+            return await repository.Update(entity, cancellationToken);
         }
         catch (Exception exception)
         {

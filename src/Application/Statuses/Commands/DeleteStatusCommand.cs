@@ -4,7 +4,6 @@ using Application.Common.Interfaces.Repositories;
 using Application.Statuses.Exceptions;
 using Domain.Statuses;
 using MediatR;
-using Optional.Unsafe;
 
 namespace Application.Statuses.Commands;
 
@@ -19,14 +18,29 @@ public class DeleteStatusCommandHandler(IStatusRepository repository, IStatusQue
     {
         var id = new StatusId(request.Id);
 
-        var status = (await queries.GetByIdAsync(id, cancellationToken)).ValueOrDefault();
+        var status = await queries.GetByIdAsync(id, cancellationToken);
 
-        if (status is null)
-            return new StatusNotFoundException(id);
+        return await status.Match(
+            async status =>
+            {
+                if (status.UserAssignments.Count != 0)
+                    return new StatusHasRelationsException(id);
 
-        if (status.UserAssignments.Count != 0)
-            return new StatusHasRelationsException(id);
+                return await DeleteEntity(status, cancellationToken);
+            },
+            () => Task.FromResult<Result<Status, StatusException>>(new StatusNotFoundException(id))
+        );
+    }
 
-        return await repository.Delete(status, cancellationToken);
+    private async Task<Result<Status, StatusException>> DeleteEntity(Status entity, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await repository.Delete(entity, cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            return new StatusUnknownException(entity.Id, exception);
+        }
     }
 }

@@ -4,7 +4,6 @@ using Application.Common.Interfaces.Repositories;
 using Application.Statuses.Exceptions;
 using Domain.Statuses;
 using MediatR;
-using Optional.Unsafe;
 
 namespace Application.Statuses.Commands;
 
@@ -18,18 +17,21 @@ public class UpdateStatusCommandHandler(IStatusRepository repository, IStatusQue
 {
     public async Task<Result<Status, StatusException>> Handle(UpdateStatusCommand request, CancellationToken cancellationToken)
     {
-        var result = (await queries.GetByNameAsync(request.Name, cancellationToken)).ValueOrDefault();
+        var result = await queries.GetByNameAsync(request.Name, cancellationToken);
 
-        if (result is not null)
-            return new StatusAlreadyExistsException(result.Id, request.Name);
+        return await result.Match(
+            status => Task.FromResult<Result<Status, StatusException>>(new StatusAlreadyExistsException(status.Id, request.Name)),
+            async () =>
+            {
+                var id = new StatusId(request.Id);
 
-        var id = new StatusId(request.Id);
+                var result = await queries.GetByIdAsync(id, cancellationToken);
 
-        var exist = await queries.GetByIdAsync(id, cancellationToken);
-
-        return await exist.Match(
-            async status => await UpdateEntity(status, request.Name, cancellationToken),
-            () => Task.FromResult<Result<Status, StatusException>>(new StatusNotFoundException(id))
+                return await result.Match(
+                    async status => await UpdateEntity(status, request.Name, cancellationToken),
+                    () => Task.FromResult<Result<Status, StatusException>>(new StatusNotFoundException(id))
+                );
+            }
         );
     }
 

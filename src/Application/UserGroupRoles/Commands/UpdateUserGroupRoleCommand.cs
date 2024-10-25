@@ -4,7 +4,6 @@ using Application.Common.Interfaces.Repositories;
 using Application.UserGroupRoles.Exceptions;
 using Domain.UserGroupRoles;
 using MediatR;
-using Optional.Unsafe;
 
 namespace Application.UserGroupRoles.Commands;
 
@@ -18,18 +17,21 @@ public class UpdateUserGroupRoleCommandHandler(IUserGroupRoleRepository reposito
 {
     public async Task<Result<UserGroupRole, UserGroupRoleException>> Handle(UpdateUserGroupRoleCommand request, CancellationToken cancellationToken)
     {
-        var result = (await queries.GetByNameAsync(request.Name, cancellationToken)).ValueOrDefault();
+        var result = await queries.GetByNameAsync(request.Name, cancellationToken);
 
-        if (result is not null)
-            return new UserGroupRoleAlreadyExistsException(result.Id, request.Name);
+        return await result.Match(
+            userGroupRole => Task.FromResult<Result<UserGroupRole, UserGroupRoleException>>(new UserGroupRoleAlreadyExistsException(userGroupRole.Id, request.Name)),
+            async () =>
+            {
+                var id = new UserGroupRoleId(request.Id);
 
-        var id = new UserGroupRoleId(request.Id);
+                var result = await queries.GetByIdAsync(id, cancellationToken);
 
-        var exist = await queries.GetByIdAsync(id, cancellationToken);
-
-        return await exist.Match(
-            async userGroupRole => await UpdateEntity(userGroupRole, request.Name, cancellationToken),
-            () => Task.FromResult<Result<UserGroupRole, UserGroupRoleException>>(new UserGroupRoleNotFoundException(id))
+                return await result.Match(
+                    async userGroupRole => await UpdateEntity(userGroupRole, request.Name, cancellationToken),
+                    () => Task.FromResult<Result<UserGroupRole, UserGroupRoleException>>(new UserGroupRoleNotFoundException(id))
+                );
+            }
         );
     }
 
