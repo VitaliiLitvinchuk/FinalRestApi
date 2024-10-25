@@ -45,6 +45,17 @@ public class UserRoleRepository(ApplicationDbContext context) : IUserRoleReposit
         return userRole is null ? Option.None<UserRole>() : Option.Some(userRole);
     }
 
+    public async Task<Option<UserRole>> GetByNameAsync(string name, CancellationToken cancellation)
+    {
+        var userRole = await UserRoles
+            .Include(x => x.Users)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Name == name, cancellation);
+
+
+        return userRole is null ? Option.None<UserRole>() : Option.Some(userRole);
+    }
+
     public async Task<UserRole> Update(UserRole userRole, CancellationToken cancellation)
     {
         UserRoles.Update(userRole);
