@@ -24,8 +24,6 @@ public class CreateStatusCommandHandler(IStatusRepository repository, IStatusQue
 
         var status = Status.New(StatusId.New(), request.Name);
 
-        await repository.Create(status, cancellationToken);
-
-        return status;
+        return await repository.Create(status, cancellationToken);
     }
 }

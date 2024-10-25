@@ -24,8 +24,6 @@ public class CreateUserRoleCommandHandler(IUserRoleRepository repository, IUserR
 
         var userRole = UserRole.New(UserRoleId.New(), request.Name);
 
-        await repository.Create(userRole, cancellationToken);
-
-        return userRole;
+        return await repository.Create(userRole, cancellationToken);
     }
 }
