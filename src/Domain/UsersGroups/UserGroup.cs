@@ -18,7 +18,7 @@ public class UserGroup(UserId userId, GroupId groupId, UserGroupRoleId userGroup
     public static UserGroup New(UserId userId, GroupId groupId, UserGroupRoleId userGroupRoleId, DateTime joinedAt)
         => new(userId, groupId, userGroupRoleId, joinedAt);
 
-    public void UpdateDetails(UserGroupRoleId userGroupRoleId)
+    public void UpdateRole(UserGroupRoleId userGroupRoleId)
     {
         UserGroupRoleId = userGroupRoleId;
     }
