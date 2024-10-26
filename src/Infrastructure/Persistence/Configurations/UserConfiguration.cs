@@ -26,7 +26,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .WithMany(x => x.Users)
             .HasForeignKey(x => x.UserRoleId)
             .HasConstraintName("FK_User_UserRole_UserRoleId")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(x => x.UserAssignments)
             .WithOne(x => x.User)

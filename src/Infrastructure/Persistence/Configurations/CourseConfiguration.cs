@@ -22,12 +22,12 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .WithMany(x => x.Courses)
             .HasForeignKey(x => x.GroupId)
             .HasConstraintName("FK_Course_Group_GroupId")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.User)
             .WithMany(x => x.Courses)
             .HasForeignKey(x => x.UserId)
             .HasConstraintName("FK_Course_User_UserId")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

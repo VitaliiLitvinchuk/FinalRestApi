@@ -36,6 +36,6 @@ public class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
             .WithMany(x => x.Assignments)
             .HasForeignKey(x => x.CourseId)
             .HasConstraintName("FK_Assignment_Course_CourseId")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

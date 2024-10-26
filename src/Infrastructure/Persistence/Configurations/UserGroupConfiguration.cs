@@ -23,18 +23,18 @@ public class UserGroupConfiguration : IEntityTypeConfiguration<UserGroup>
             .WithMany(x => x.UserGroups)
             .HasForeignKey(x => x.GroupId)
             .HasConstraintName("FK_UserGroup_Group_GroupId")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.User)
             .WithMany(x => x.UserGroups)
             .HasForeignKey(x => x.UserId)
             .HasConstraintName("FK_UserGroup_User_UserId")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.UserGroupRole)
             .WithMany(x => x.UserGroups)
             .HasForeignKey(x => x.UserGroupRoleId)
             .HasConstraintName("FK_UserGroup_UserGroupRole_UserGroupRoleId")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

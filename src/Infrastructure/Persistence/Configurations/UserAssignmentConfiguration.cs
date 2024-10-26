@@ -17,16 +17,19 @@ public class UserAssignmentConfiguration : IEntityTypeConfiguration<UserAssignme
         builder.HasOne(x => x.Assignment)
             .WithMany(x => x.UserAssignments)
             .HasConstraintName("FK_UserAssignment_Assignment_AssignmentId")
-            .HasForeignKey(x => x.AssignmentId);
+            .HasForeignKey(x => x.AssignmentId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.User)
             .WithMany(x => x.UserAssignments)
             .HasConstraintName("FK_UserAssignment_User_UserId")
-            .HasForeignKey(x => x.UserId);
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.Status)
             .WithMany(x => x.UserAssignments)
             .HasConstraintName("FK_UserAssignment_Status_StatusId")
-            .HasForeignKey(x => x.StatusId);
+            .HasForeignKey(x => x.StatusId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
