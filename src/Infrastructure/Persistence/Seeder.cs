@@ -171,7 +171,7 @@ public static class Seeder
             foreach (var user in users)
             {
                 IEnumerable<UserAssignment> userAssignmentList = assignments.ToList()
-                    .Select((x, i) => UserAssignment.New(x.Id, user.Id, statuss[i % 3].Id));
+                    .Select((x, i) => UserAssignment.New(x.Id, user.Id, statuss[i % statuss.Count].Id));
 
                 await userAssignments.AddRangeAsync(userAssignmentList);
             }
