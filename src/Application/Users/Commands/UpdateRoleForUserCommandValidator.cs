@@ -1,11 +1,10 @@
-using System;
 using FluentValidation;
 
 namespace Application.Users.Commands;
 
-public class UpdateRoleCommandValidator : AbstractValidator<UpdateRoleCommand>
+public class UpdateRoleForUserCommandValidator : AbstractValidator<UpdateRoleForUserCommand>
 {
-    public UpdateRoleCommandValidator()
+    public UpdateRoleForUserCommandValidator()
     {
         RuleFor(x => x.Id)
             .NotEmpty();
