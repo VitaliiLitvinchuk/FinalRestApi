@@ -13,7 +13,7 @@ public class User(UserId id, string firstName, string lastName, string email, st
     public string Email { get; private set; } = email;
     public string GoogleId { get; private set; } = googleId;
     public string AvatarUrl { get; private set; } = avatarUrl;
-    public UserRoleId UserRoleId { get; } = userRoleId;
+    public UserRoleId UserRoleId { get; private set; } = userRoleId;
     public DateTime CreatedAt { get; } = createdAt;
 
     public UserRole? UserRole { get; }
@@ -30,5 +30,10 @@ public class User(UserId id, string firstName, string lastName, string email, st
         FirstName = firstName;
         LastName = lastName;
         AvatarUrl = avatarUrl;
+    }
+
+    public void UpdateRole(UserRoleId userRoleId)
+    {
+        UserRoleId = userRoleId;
     }
 }
