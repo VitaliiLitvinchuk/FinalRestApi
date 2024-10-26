@@ -37,7 +37,7 @@ public static class Seeder
             await SeedUsers(context.Users, context.UserRoles);
             await context.SaveChangesAsync();
 
-            await SeedUserGroups(context.UserGroups, context.Users, context.Groups, context.UserGroupRoles);
+            await SeedUsersGroups(context.UserGroups, context.Users, context.Groups, context.UserGroupRoles);
             await context.SaveChangesAsync();
 
             await SeedCourses(context.Courses, context.Users, context.Groups);
@@ -46,7 +46,7 @@ public static class Seeder
             await SeedAssignments(context.Assignments, context.Courses);
             await context.SaveChangesAsync();
 
-            await SeedUserAssignments(context.UserAssignments, context.Users, context.Assignments, context.Statuses);
+            await SeedUsersAssignments(context.UserAssignments, context.Users, context.Assignments, context.Statuses);
             await context.SaveChangesAsync();
         }
     }
@@ -129,7 +129,7 @@ public static class Seeder
         }
     }
 
-    public static async Task SeedUserGroups(DbSet<UserGroup> userGroups, DbSet<User> users, DbSet<Group> groups, DbSet<UserGroupRole> userGroupRoles)
+    public static async Task SeedUsersGroups(DbSet<UserGroup> userGroups, DbSet<User> users, DbSet<Group> groups, DbSet<UserGroupRole> userGroupRoles)
     {
         if (!userGroups.Any())
         {
@@ -163,7 +163,7 @@ public static class Seeder
         }
     }
 
-    public static async Task SeedUserAssignments(DbSet<UserAssignment> userAssignments, DbSet<User> users, DbSet<Assignment> assignments, DbSet<Status> statuses)
+    public static async Task SeedUsersAssignments(DbSet<UserAssignment> userAssignments, DbSet<User> users, DbSet<Assignment> assignments, DbSet<Status> statuses)
     {
         if (!userAssignments.Any())
         {
