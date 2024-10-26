@@ -141,7 +141,7 @@ public static class Seeder
 
             foreach (var group in groups)
             {
-                var count = random.Next(1, users.Count());
+                var count = random.Next(1, userList.Count);
                 var userGroupList = userList
                     .OrderBy(x => Guid.NewGuid())
                     .Take(count)
