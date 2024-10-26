@@ -26,12 +26,14 @@ public static class Seeder
         await SeedUserRoles(context.UserRoles);
         await SeedUserGroupRoles(context.UserGroupRoles);
         await SeedStatuses(context.Statuses);
-        await SeedGroups(context.Groups);
 
         await context.SaveChangesAsync();
 
         if (env.IsDevelopment())
         {
+            await SeedGroups(context.Groups);
+            await context.SaveChangesAsync();
+
             await SeedUsers(context.Users, context.UserRoles);
             await context.SaveChangesAsync();
 
