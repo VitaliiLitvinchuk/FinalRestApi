@@ -11,16 +11,16 @@ using MediatR;
 
 namespace Application.UsersGroups.Commands;
 
-public record UpdateRoleForUserGroupCommand : IRequest<Result<UserGroup, Exception>>
+public record UpdateRoleForUserGroupCommand : IRequest<Result<UserGroup, UserGroupException>>
 {
     public Guid UserId { get; init; }
     public Guid GroupId { get; init; }
     public Guid UserGroupRoleId { get; init; }
 }
 
-public class UpdateRoleForUserGroupCommandHandler(IUserGroupRepository repository, IUserGroupQueries queries, IUserGroupRoleQueries userGroupRoleQueries) : IRequestHandler<UpdateRoleForUserGroupCommand, Result<UserGroup, Exception>>
+public class UpdateRoleForUserGroupCommandHandler(IUserGroupRepository repository, IUserGroupQueries queries, IUserGroupRoleQueries userGroupRoleQueries) : IRequestHandler<UpdateRoleForUserGroupCommand, Result<UserGroup, UserGroupException>>
 {
-    public async Task<Result<UserGroup, Exception>> Handle(UpdateRoleForUserGroupCommand request, CancellationToken cancellationToken)
+    public async Task<Result<UserGroup, UserGroupException>> Handle(UpdateRoleForUserGroupCommand request, CancellationToken cancellationToken)
     {
         var userId = new UserId(request.UserId);
         var groupId = new GroupId(request.GroupId);
@@ -36,14 +36,14 @@ public class UpdateRoleForUserGroupCommandHandler(IUserGroupRepository repositor
 
                 return await result.Match(
                     async userGroupRole => await UpdateEntity(userGroup, userGroupRoleId, cancellationToken),
-                    () => Task.FromResult<Result<UserGroup, Exception>>(new UserGroupRoleNotFoundException(userGroupRoleId))
+                    () => Task.FromResult<Result<UserGroup, UserGroupException>>(new RoleForUserGroupNotFoundException(userId, groupId))
                 );
             },
-            () => Task.FromResult<Result<UserGroup, Exception>>(new UserGroupNotFoundException(userId, groupId))
+            () => Task.FromResult<Result<UserGroup, UserGroupException>>(new UserGroupNotFoundException(userId, groupId))
         );
     }
 
-    private async Task<Result<UserGroup, Exception>> UpdateEntity(UserGroup userGroup, UserGroupRoleId userGroupRoleId, CancellationToken cancellationToken)
+    private async Task<Result<UserGroup, UserGroupException>> UpdateEntity(UserGroup userGroup, UserGroupRoleId userGroupRoleId, CancellationToken cancellationToken)
     {
         try
         {

@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Application.UserAssignments.Commands;
 
-public record UpdateUserAssignmentCommand : IRequest<Result<UserAssignment, Exception>>
+public record UpdateUserAssignmentCommand : IRequest<Result<UserAssignment, UserAssignmentException>>
 {
     public required Guid UserId { get; init; }
     public required Guid AssignmentId { get; init; }
@@ -19,9 +19,9 @@ public record UpdateUserAssignmentCommand : IRequest<Result<UserAssignment, Exce
     public decimal? Score { get; init; }
 }
 
-public class UpdateUserAssignmentCommandHandler(IUserAssignmentRepository repository, IUserAssignmentQueries queries, IStatusQueries statusQueries) : IRequestHandler<UpdateUserAssignmentCommand, Result<UserAssignment, Exception>>
+public class UpdateUserAssignmentCommandHandler(IUserAssignmentRepository repository, IUserAssignmentQueries queries, IStatusQueries statusQueries) : IRequestHandler<UpdateUserAssignmentCommand, Result<UserAssignment, UserAssignmentException>>
 {
-    public async Task<Result<UserAssignment, Exception>> Handle(UpdateUserAssignmentCommand request, CancellationToken cancellationToken)
+    public async Task<Result<UserAssignment, UserAssignmentException>> Handle(UpdateUserAssignmentCommand request, CancellationToken cancellationToken)
     {
         var userId = new UserId(request.UserId);
         var assignmentId = new AssignmentId(request.AssignmentId);
@@ -37,14 +37,14 @@ public class UpdateUserAssignmentCommandHandler(IUserAssignmentRepository reposi
 
                 return await statusOption.Match(
                     async status => await UpdateEntity(userAssignment, status.Id, request.SubmittedAt, request.Score, cancellationToken),
-                    () => Task.FromResult<Result<UserAssignment, Exception>>(new StatusForUserAssignmentException(userId, assignmentId))
+                    () => Task.FromResult<Result<UserAssignment, UserAssignmentException>>(new StatusForUserAssignmentException(userId, assignmentId))
                 );
             },
-            () => Task.FromResult<Result<UserAssignment, Exception>>(new UserAssignmentNotFoundException(userId, assignmentId))
+            () => Task.FromResult<Result<UserAssignment, UserAssignmentException>>(new UserAssignmentNotFoundException(userId, assignmentId))
         );
     }
 
-    private async Task<Result<UserAssignment, Exception>> UpdateEntity(UserAssignment entity, StatusId statusId, DateTime? submittedAt, decimal? score, CancellationToken cancellationToken)
+    private async Task<Result<UserAssignment, UserAssignmentException>> UpdateEntity(UserAssignment entity, StatusId statusId, DateTime? submittedAt, decimal? score, CancellationToken cancellationToken)
     {
         try
         {

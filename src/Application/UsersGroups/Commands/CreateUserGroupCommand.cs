@@ -1,8 +1,6 @@
 using Application.Common;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
-using Application.Groups.Exceptions;
-using Application.Users.Exceptions;
 using Application.UsersGroups.Exceptions;
 using Domain.Groups;
 using Domain.Users;
@@ -11,7 +9,7 @@ using MediatR;
 
 namespace Application.UsersGroups.Commands;
 
-public record CreateUserGroupCommand : IRequest<Result<UserGroup, Exception>>
+public record CreateUserGroupCommand : IRequest<Result<UserGroup, UserGroupException>>
 {
     public required Guid UserId { get; init; }
     public required Guid GroupId { get; init; }
@@ -21,17 +19,18 @@ public class CreateUserGroupCommandHandler(IUserGroupRepository repository,
     IUserGroupQueries queries,
     IUserQueries userQueries,
     IGroupQueries groupQueries,
-    IUserGroupRoleQueries roleQueries) : IRequestHandler<CreateUserGroupCommand, Result<UserGroup, Exception>>
+    IUserGroupRoleQueries roleQueries) : IRequestHandler<CreateUserGroupCommand, Result<UserGroup, UserGroupException>>
 {
-    public async Task<Result<UserGroup, Exception>> Handle(CreateUserGroupCommand request, CancellationToken cancellationToken)
+    public async Task<Result<UserGroup, UserGroupException>> Handle(CreateUserGroupCommand request, CancellationToken cancellationToken)
     {
         var userId = new UserId(request.UserId);
+        var groupId = new GroupId(request.GroupId);
+
         var userOption = await userQueries.GetByIdAsync(userId, cancellationToken);
 
         return await userOption.Match(
             async user =>
             {
-                var groupId = new GroupId(request.GroupId);
                 var groupOption = await groupQueries.GetByIdAsync(groupId, cancellationToken);
 
                 return await groupOption.Match(
@@ -45,21 +44,21 @@ public class CreateUserGroupCommandHandler(IUserGroupRepository repository,
                                 var userGroupOption = await queries.GetByUserIdAndGroupIdAsync(userId, groupId, cancellationToken);
 
                                 return await userGroupOption.Match(
-                                    userGroup => Task.FromResult<Result<UserGroup, Exception>>(new UserGroupAlreadyExistsException(userId, groupId)),
+                                    userGroup => Task.FromResult<Result<UserGroup, UserGroupException>>(new UserGroupAlreadyExistsException(userId, groupId)),
                                     async () => await CreateEntity(UserGroup.New(userId, groupId, userGroupRole.Id, DateTime.UtcNow), cancellationToken)
                                 );
                             },
-                            () => Task.FromResult<Result<UserGroup, Exception>>(new UserGroupDefaultRoleNotFoundException(userId, groupId))
+                            () => Task.FromResult<Result<UserGroup, UserGroupException>>(new UserGroupDefaultRoleNotFoundException(userId, groupId))
                         );
                     },
-                    () => Task.FromResult<Result<UserGroup, Exception>>(new GroupNotFoundException(groupId))
+                    () => Task.FromResult<Result<UserGroup, UserGroupException>>(new GroupForUserGroupNotFoundException(userId, groupId))
                 );
             },
-            () => Task.FromResult<Result<UserGroup, Exception>>(new UserNotFoundException(userId))
+            () => Task.FromResult<Result<UserGroup, UserGroupException>>(new UserForUserGroupNotFoundException(userId, groupId))
         );
     }
 
-    private async Task<Result<UserGroup, Exception>> CreateEntity(UserGroup userGroup, CancellationToken cancellationToken)
+    private async Task<Result<UserGroup, UserGroupException>> CreateEntity(UserGroup userGroup, CancellationToken cancellationToken)
     {
         try
         {

@@ -9,15 +9,15 @@ using MediatR;
 
 namespace Application.UserAssignments.Commands;
 
-public record DeleteUserAssignmentCommand : IRequest<Result<UserAssignment, Exception>>
+public record DeleteUserAssignmentCommand : IRequest<Result<UserAssignment, UserAssignmentException>>
 {
     public required Guid UserId { get; init; }
     public required Guid AssignmentId { get; init; }
 }
 
-public class DeleteUserAssignmentCommandHandler(IUserAssignmentRepository repository, IUserAssignmentQueries queries) : IRequestHandler<DeleteUserAssignmentCommand, Result<UserAssignment, Exception>>
+public class DeleteUserAssignmentCommandHandler(IUserAssignmentRepository repository, IUserAssignmentQueries queries) : IRequestHandler<DeleteUserAssignmentCommand, Result<UserAssignment, UserAssignmentException>>
 {
-    public async Task<Result<UserAssignment, Exception>> Handle(DeleteUserAssignmentCommand request, CancellationToken cancellationToken)
+    public async Task<Result<UserAssignment, UserAssignmentException>> Handle(DeleteUserAssignmentCommand request, CancellationToken cancellationToken)
     {
         var userId = new UserId(request.UserId);
         var assignmentId = new AssignmentId(request.AssignmentId);
@@ -26,11 +26,11 @@ public class DeleteUserAssignmentCommandHandler(IUserAssignmentRepository reposi
 
         return await userAssignmentOption.Match(
             async userAssignment => await DeleteEntity(userAssignment, cancellationToken),
-            () => Task.FromResult<Result<UserAssignment, Exception>>(new UserAssignmentNotFoundException(userId, assignmentId))
+            () => Task.FromResult<Result<UserAssignment, UserAssignmentException>>(new UserAssignmentNotFoundException(userId, assignmentId))
         );
     }
 
-    private async Task<Result<UserAssignment, Exception>> DeleteEntity(UserAssignment entity, CancellationToken cancellationToken)
+    private async Task<Result<UserAssignment, UserAssignmentException>> DeleteEntity(UserAssignment entity, CancellationToken cancellationToken)
     {
         try
         {

@@ -13,3 +13,6 @@ public class UserGroupNotFoundException(UserId userId, GroupId groupId) : UserGr
 public class UserGroupAlreadyExistsException(UserId userId, GroupId groupId) : UserGroupException(userId, groupId, $"User with id: {userId} and group with id: {groupId} relation already exists.");
 public class UserGroupUnknownException(UserId userId, GroupId groupId, Exception innerException) : UserGroupException(userId, groupId, $"User with id: {userId} and group with id: {groupId} relation is unknown.", innerException);
 public class UserGroupDefaultRoleNotFoundException(UserId userId, GroupId groupId) : UserGroupException(userId, groupId, $"Default role not found for user with id: {userId} and group with id: {groupId}.");
+public class RoleForUserGroupNotFoundException(UserId userId, GroupId groupId) : UserGroupException(userId, groupId, $"Role for user with id: {userId} and group with id: {groupId} not found.");
+public class GroupForUserGroupNotFoundException(UserId userId, GroupId groupId) : UserGroupException(userId, groupId, $"Group with id: {groupId} not found.");
+public class UserForUserGroupNotFoundException(UserId userId, GroupId groupId) : UserGroupException(userId, groupId, $"User with id: {userId} not found.");
