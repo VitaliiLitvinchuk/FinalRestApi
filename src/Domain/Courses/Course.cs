@@ -9,12 +9,13 @@ public class Course(CourseId id, string name, string description, UserId userId,
     public CourseId Id { get; } = id;
     public string Name { get; private set; } = name;
     public string Description { get; private set; } = description;
-    public UserId UserId { get; } = userId;
-    public GroupId GroupId { get; } = groupId;
+    public UserId UserId { get; private set; } = userId;
+    public GroupId GroupId { get; private set; } = groupId;
     public DateTime CreatedAt { get; } = createdAt;
 
     public User? User { get; }
     public Group? Group { get; }
+
     public ICollection<Assignment> Assignments { get; } = [];
 
     public static Course New(CourseId id, string name, string description, UserId userId, GroupId groupId, DateTime createdAt)
@@ -25,5 +26,14 @@ public class Course(CourseId id, string name, string description, UserId userId,
         Name = name;
         Description = description;
     }
-}
 
+    public void UpdateGroup(GroupId groupId)
+    {
+        GroupId = groupId;
+    }
+
+    public void UpdateUser(UserId userId)
+    {
+        UserId = userId;
+    }
+}
