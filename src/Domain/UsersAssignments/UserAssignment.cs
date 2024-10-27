@@ -26,4 +26,3 @@ public class UserAssignment(AssignmentId assignmentId, UserId userId, StatusId s
         Score = score;
     }
 }
-

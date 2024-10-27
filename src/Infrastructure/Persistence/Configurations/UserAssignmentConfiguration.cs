@@ -1,6 +1,8 @@
 using Domain.Assignments;
+using Domain.Statuses;
 using Domain.Users;
 using Domain.UsersAssignments;
+using Infrastructure.Constraints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,6 +15,14 @@ public class UserAssignmentConfiguration : IEntityTypeConfiguration<UserAssignme
         builder.HasKey(x => new { x.AssignmentId, x.UserId });
         builder.Property(x => x.AssignmentId).HasConversion(x => x.Value, x => new AssignmentId(x));
         builder.Property(x => x.UserId).HasConversion(x => x.Value, x => new UserId(x));
+
+        builder.Property(x => x.StatusId).HasConversion(x => x.Value, x => new StatusId(x));
+
+        builder.Property(x => x.SubmittedAt)
+            .HasConversion(new DateTimeUtcConverter());
+
+        builder.Property(x => x.Score)
+            .HasPrecision(5, 2);
 
         builder.HasOne(x => x.Assignment)
             .WithMany(x => x.UserAssignments)
