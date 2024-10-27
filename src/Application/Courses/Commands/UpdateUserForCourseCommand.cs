@@ -43,6 +43,7 @@ public class UpdateUserForCourseCommandHandler(ICourseRepository repository, ICo
         try
         {
             entity.UpdateUser(userId);
+
             return await repository.Update(entity, cancellationToken);
         }
         catch (Exception exception)

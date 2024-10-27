@@ -43,6 +43,7 @@ public class UpdateGroupForCourseCommandHandler(ICourseRepository repository, IC
         try
         {
             entity.UpdateGroup(groupId);
+
             return await repository.Update(entity, cancellationToken);
         }
         catch (Exception exception)
