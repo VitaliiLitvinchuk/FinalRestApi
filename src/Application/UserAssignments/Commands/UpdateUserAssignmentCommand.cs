@@ -14,7 +14,7 @@ public record UpdateUserAssignmentCommand : IRequest<Result<UserAssignment, User
 {
     public required Guid UserId { get; init; }
     public required Guid AssignmentId { get; init; }
-    public Guid StatusId { get; init; }
+    public required Guid StatusId { get; init; }
     public DateTime? SubmittedAt { get; init; }
     public decimal? Score { get; init; }
 }
