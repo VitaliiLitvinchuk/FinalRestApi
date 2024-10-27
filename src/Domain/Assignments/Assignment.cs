@@ -6,7 +6,7 @@ namespace Domain.Assignments;
 public class Assignment(AssignmentId id, CourseId courseId, string title, string description, DateTime dueDate, decimal maxScore, DateTime createdAt)
 {
     public AssignmentId Id { get; } = id;
-    public CourseId CourseId { get; } = courseId;
+    public CourseId CourseId { get; private set; } = courseId;
     public string Title { get; private set; } = title;
     public string Description { get; private set; } = description;
     public DateTime DueDate { get; private set; } = dueDate;
@@ -14,6 +14,7 @@ public class Assignment(AssignmentId id, CourseId courseId, string title, string
     public DateTime CreatedAt { get; } = createdAt;
 
     public Course? Course { get; }
+
     public ICollection<UserAssignment> UserAssignments { get; } = [];
 
     public static Assignment New(AssignmentId id, CourseId courseId, string title, string description, DateTime dueDate, decimal maxScore, DateTime createdAt)
@@ -26,5 +27,9 @@ public class Assignment(AssignmentId id, CourseId courseId, string title, string
         DueDate = dueDate;
         MaxScore = maxScore;
     }
-}
 
+    public void UpdateCourse(CourseId courseId)
+    {
+        CourseId = courseId;
+    }
+}

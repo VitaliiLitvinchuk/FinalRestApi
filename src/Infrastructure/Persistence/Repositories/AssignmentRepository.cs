@@ -48,7 +48,7 @@ public class AssignmentRepository(ApplicationDbContext context) : IAssignmentRep
             .ToListAsync(cancellation);
     }
 
-    public async Task<Option<Assignment>> GetIdAsync(AssignmentId id, CancellationToken cancellation)
+    public async Task<Option<Assignment>> GetByIdAsync(AssignmentId id, CancellationToken cancellation)
     {
         var assignment = await Assignments
             .Include(x => x.UserAssignments)
