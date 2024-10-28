@@ -49,7 +49,7 @@ public class CreateUserAssignmentCommandHandler(IUserAssignmentRepository reposi
 
                                         return await CreateEntity(userAssignment, cancellationToken);
                                     },
-                                    () => Task.FromResult<Result<UserAssignment, UserAssignmentException>>(new DefaultStatusForUserAssignmentException(userId, assignmentId))
+                                    () => Task.FromResult<Result<UserAssignment, UserAssignmentException>>(new DefaultStatusForUserAssignmentNotFoundException(userId, assignmentId))
                                 );
                             }
                         );

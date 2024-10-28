@@ -37,7 +37,7 @@ public class UpdateUserAssignmentCommandHandler(IUserAssignmentRepository reposi
 
                 return await statusOption.Match(
                     async status => await UpdateEntity(userAssignment, status.Id, request.SubmittedAt, request.Score, cancellationToken),
-                    () => Task.FromResult<Result<UserAssignment, UserAssignmentException>>(new StatusForUserAssignmentException(userId, assignmentId))
+                    () => Task.FromResult<Result<UserAssignment, UserAssignmentException>>(new StatusForUserAssignmentNotFoundException(userId, assignmentId))
                 );
             },
             () => Task.FromResult<Result<UserAssignment, UserAssignmentException>>(new UserAssignmentNotFoundException(userId, assignmentId))
