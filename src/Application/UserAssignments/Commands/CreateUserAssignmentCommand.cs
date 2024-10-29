@@ -1,9 +1,7 @@
-using Application.Assignments.Exceptions;
 using Application.Common;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Application.UserAssignments.Exceptions;
-using Application.Users.Exceptions;
 using Domain.Assignments;
 using Domain.Users;
 using Domain.UsersAssignments;
@@ -13,8 +11,8 @@ namespace Application.UserAssignments.Commands;
 
 public record CreateUserAssignmentCommand : IRequest<Result<UserAssignment, UserAssignmentException>>
 {
-    public Guid UserId { get; init; }
-    public Guid AssignmentId { get; init; }
+    public required Guid UserId { get; init; }
+    public required Guid AssignmentId { get; init; }
 }
 
 public class CreateUserAssignmentCommandHandler(IUserAssignmentRepository repository, IUserAssignmentQueries queries, IUserQueries userQueries, IAssignmentQueries assignmentQueries, IStatusQueries statusQueries) : IRequestHandler<CreateUserAssignmentCommand, Result<UserAssignment, UserAssignmentException>>

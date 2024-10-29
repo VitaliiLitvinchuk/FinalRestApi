@@ -15,8 +15,8 @@ public record UpdateUserAssignmentCommand : IRequest<Result<UserAssignment, User
     public required Guid UserId { get; init; }
     public required Guid AssignmentId { get; init; }
     public required Guid StatusId { get; init; }
-    public DateTime? SubmittedAt { get; init; }
-    public decimal? Score { get; init; }
+    public required DateTime? SubmittedAt { get; init; }
+    public required decimal? Score { get; init; }
 }
 
 public class UpdateUserAssignmentCommandHandler(IUserAssignmentRepository repository, IUserAssignmentQueries queries, IStatusQueries statusQueries) : IRequestHandler<UpdateUserAssignmentCommand, Result<UserAssignment, UserAssignmentException>>

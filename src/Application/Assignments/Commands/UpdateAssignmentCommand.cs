@@ -9,7 +9,7 @@ namespace Application.Assignments.Commands;
 
 public record UpdateAssignmentCommand : IRequest<Result<Assignment, AssignmentException>>
 {
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
     public required string Title { get; init; }
     public required string Description { get; init; }
     public required DateTime DueDate { get; init; }

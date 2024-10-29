@@ -1,7 +1,6 @@
 using Application.Common;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
-using Application.UserGroupRoles.Exceptions;
 using Application.UsersGroups.Exceptions;
 using Domain.Groups;
 using Domain.UserGroupRoles;
@@ -13,9 +12,9 @@ namespace Application.UsersGroups.Commands;
 
 public record UpdateRoleForUserGroupCommand : IRequest<Result<UserGroup, UserGroupException>>
 {
-    public Guid UserId { get; init; }
-    public Guid GroupId { get; init; }
-    public Guid UserGroupRoleId { get; init; }
+    public required Guid UserId { get; init; }
+    public required Guid GroupId { get; init; }
+    public required Guid UserGroupRoleId { get; init; }
 }
 
 public class UpdateRoleForUserGroupCommandHandler(IUserGroupRepository repository, IUserGroupQueries queries, IUserGroupRoleQueries userGroupRoleQueries) : IRequestHandler<UpdateRoleForUserGroupCommand, Result<UserGroup, UserGroupException>>
