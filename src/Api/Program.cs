@@ -1,6 +1,7 @@
 using Api.ConsoleExecutor;
 using Api.Injections;
 using Api.Modules;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 await ConsoleExecutor.RunViaConsoleProcess("docker-compose", "up -d");
 
@@ -8,14 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
-builder.Services.AddCors();
-
-builder.Services.AddRouting(options =>
+builder.Services.AddControllers(options =>
 {
-    options.LowercaseUrls = true;
-    options.LowercaseQueryStrings = true;
+    options.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseParameterTransformer()));
 });
+
+builder.Services.AddCors();
 
 builder.Services.UseInjections(builder.Configuration);
 builder.Services.SetupServices();
