@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Domain.Groups;
@@ -30,14 +31,24 @@ public class UserGroupRepository(ApplicationDbContext context) : IUserGroupRepos
         return userGroup;
     }
 
-    public async Task<IEnumerable<UserGroup>> GetAllAsync(CancellationToken cancellation)
+    public async Task<IEnumerable<UserGroup>> GetAllAsync(CancellationToken cancellation,
+        Expression<Func<UserGroup, bool>>? filter = null,
+        Func<IQueryable<UserGroup>, IOrderedQueryable<UserGroup>>? orderBy = null,
+        params Expression<Func<UserGroup, object?>>[] includes)
     {
-        return await UserGroups
-            .Include(x => x.User)
-            .Include(x => x.Group)
-            .Include(x => x.UserGroupRole)
-            .AsNoTracking()
-            .ToListAsync(cancellation);
+        IQueryable<UserGroup> query = UserGroups.AsQueryable()
+                                            .AsNoTracking();
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        if (orderBy != null)
+            return await orderBy(query).ToListAsync(cancellation);
+
+        return await query.ToListAsync(cancellation);
     }
 
     public async Task<IEnumerable<UserGroup>> GetByGroupIdAndUserGroupRoleIdAsync(GroupId groupId, UserGroupRoleId userGroupRoleId, CancellationToken cancellation)

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Domain.Groups;
@@ -27,13 +28,24 @@ public class GroupRepository(ApplicationDbContext context) : IGroupRepository, I
         return group;
     }
 
-    public async Task<IEnumerable<Group>> GetAllAsync(CancellationToken cancellation)
+    public async Task<IEnumerable<Group>> GetAllAsync(CancellationToken cancellation,
+        Expression<Func<Group, bool>>? filter = null,
+        Func<IQueryable<Group>, IOrderedQueryable<Group>>? orderBy = null,
+        params Expression<Func<Group, object?>>[] includes)
     {
-        return await Groups
-            .Include(x => x.Courses)
-            .Include(x => x.UserGroups)
-            .AsNoTracking()
-            .ToListAsync(cancellation);
+        IQueryable<Group> query = Groups.AsQueryable()
+                                        .AsNoTracking();
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        if (orderBy != null)
+            return await orderBy(query).ToListAsync(cancellation);
+
+        return await query.ToListAsync(cancellation);
     }
 
     public async Task<Option<Group>> GetByIdAsync(GroupId id, CancellationToken cancellation)

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Domain.Assignments;
@@ -29,15 +30,6 @@ public class AssignmentRepository(ApplicationDbContext context) : IAssignmentRep
         return assignment;
     }
 
-    public async Task<IEnumerable<Assignment>> GetAllAsync(CancellationToken cancellation)
-    {
-        return await Assignments
-            .Include(x => x.UserAssignments)
-            .Include(x => x.Course)
-            .AsNoTracking()
-            .ToListAsync(cancellation);
-    }
-
     public async Task<IEnumerable<Assignment>> GetCourseIdAsync(CourseId id, CancellationToken cancellation)
     {
         return await Assignments
@@ -66,5 +58,25 @@ public class AssignmentRepository(ApplicationDbContext context) : IAssignmentRep
         await context.SaveChangesAsync(cancellation);
 
         return assignment;
+    }
+
+    public async Task<IEnumerable<Assignment>> GetAllAsync(CancellationToken cancellation,
+        Expression<Func<Assignment, bool>>? filter = null,
+        Func<IQueryable<Assignment>, IOrderedQueryable<Assignment>>? orderBy = null,
+        params Expression<Func<Assignment, object?>>[] includes)
+    {
+        IQueryable<Assignment> query = Assignments.AsQueryable()
+                                                  .AsNoTracking();
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        if (orderBy != null)
+            return await orderBy(query).ToListAsync(cancellation);
+
+        return await query.ToListAsync(cancellation);
     }
 }

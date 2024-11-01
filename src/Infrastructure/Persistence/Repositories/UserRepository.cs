@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Domain.UserRoles;
@@ -28,15 +29,24 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository, IUs
         return user;
     }
 
-    public async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellation)
+    public async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellation,
+        Expression<Func<User, bool>>? filter = null,
+        Func<IQueryable<User>, IOrderedQueryable<User>>? orderBy = null,
+        params Expression<Func<User, object?>>[] includes)
     {
-        return await Users
-            .Include(x => x.Courses)
-            .Include(x => x.UserAssignments)
-            .Include(x => x.UserGroups)
-            .Include(x => x.UserRole)
-            .AsNoTracking()
-            .ToListAsync(cancellation);
+        IQueryable<User> query = Users.AsQueryable()
+                                      .AsNoTracking();
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        if (orderBy != null)
+            return await orderBy(query).ToListAsync(cancellation);
+
+        return await query.ToListAsync(cancellation);
     }
 
     public async Task<Option<User>> GetByEmailAsync(string email, CancellationToken cancellation)

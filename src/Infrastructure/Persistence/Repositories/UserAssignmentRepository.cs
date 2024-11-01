@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Domain.Assignments;
@@ -30,14 +31,24 @@ public class UserAssignmentRepository(ApplicationDbContext context) : IUserAssig
         return userAssignment;
     }
 
-    public async Task<IEnumerable<UserAssignment>> GetAllAsync(CancellationToken cancellation)
+    public async Task<IEnumerable<UserAssignment>> GetAllAsync(CancellationToken cancellation,
+        Expression<Func<UserAssignment, bool>>? filter = null,
+        Func<IQueryable<UserAssignment>, IOrderedQueryable<UserAssignment>>? orderBy = null,
+        params Expression<Func<UserAssignment, object?>>[] includes)
     {
-        return await UserAssignments
-            .Include(x => x.Status)
-            .Include(x => x.User)
-            .Include(x => x.Assignment)
-            .AsNoTracking()
-            .ToListAsync(cancellation);
+        IQueryable<UserAssignment> query = UserAssignments.AsQueryable()
+                                                          .AsNoTracking();
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        if (orderBy != null)
+            return await orderBy(query).ToListAsync(cancellation);
+
+        return await query.ToListAsync(cancellation);
     }
 
     public async Task<IEnumerable<UserAssignment>> GetByAssignmentIdAndStatusIdAsync(AssignmentId assignmentId, StatusId statusId, CancellationToken cancellation)

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Domain.Courses;
@@ -37,6 +38,26 @@ public class CourseRepository(ApplicationDbContext context) : ICourseRepository,
             .Include(x => x.Assignments)
             .AsNoTracking()
             .ToListAsync(cancellation);
+    }
+
+    public async Task<IEnumerable<Course>> GetAllAsync(CancellationToken cancellation,
+        Expression<Func<Course, bool>>? filter = null,
+        Func<IQueryable<Course>, IOrderedQueryable<Course>>? orderBy = null,
+        params Expression<Func<Course, object?>>[] includes)
+    {
+        IQueryable<Course> query = Courses.AsQueryable()
+                                          .AsNoTracking();
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        if (orderBy != null)
+            return await orderBy(query).ToListAsync(cancellation);
+
+        return await query.ToListAsync(cancellation);
     }
 
     public async Task<IEnumerable<Course>> GetByGroupIdAsync(GroupId groupId, CancellationToken cancellation)

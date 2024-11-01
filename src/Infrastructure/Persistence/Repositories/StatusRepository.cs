@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Domain.Statuses;
@@ -27,12 +28,24 @@ public class StatusRepository(ApplicationDbContext context) : IStatusRepository,
         return status;
     }
 
-    public async Task<IEnumerable<Status>> GetAllAsync(CancellationToken cancellation)
+    public async Task<IEnumerable<Status>> GetAllAsync(CancellationToken cancellation,
+        Expression<Func<Status, bool>>? filter = null,
+        Func<IQueryable<Status>, IOrderedQueryable<Status>>? orderBy = null,
+        params Expression<Func<Status, object?>>[] includes)
     {
-        return await Statuses
-            .Include(x => x.UserAssignments)
-            .AsNoTracking()
-            .ToListAsync(cancellation);
+        IQueryable<Status> query = Statuses.AsQueryable()
+                                           .AsNoTracking();
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        if (orderBy != null)
+            return await orderBy(query).ToListAsync(cancellation);
+
+        return await query.ToListAsync(cancellation);
     }
 
     public async Task<Option<Status>> GetByIdAsync(StatusId id, CancellationToken cancellation)

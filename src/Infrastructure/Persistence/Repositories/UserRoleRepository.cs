@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Domain.UserRoles;
@@ -27,12 +28,23 @@ public class UserRoleRepository(ApplicationDbContext context) : IUserRoleReposit
         return userRole;
     }
 
-    public async Task<IEnumerable<UserRole>> GetAllAsync(CancellationToken cancellation)
+    public async Task<IEnumerable<UserRole>> GetAllAsync(CancellationToken cancellation,
+        Expression<Func<UserRole, bool>>? filter = null,
+        Func<IQueryable<UserRole>, IOrderedQueryable<UserRole>>? orderBy = null,
+        params Expression<Func<UserRole, object?>>[] includes)
     {
-        return await UserRoles
-            .Include(x => x.Users)
-            .AsNoTracking()
-            .ToListAsync(cancellation);
+        IQueryable<UserRole> query = UserRoles;
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        if (orderBy != null)
+            return await orderBy(query).ToListAsync(cancellation);
+
+        return await query.ToListAsync(cancellation);
     }
 
     public async Task<Option<UserRole>> GetByIdAsync(UserRoleId id, CancellationToken cancellation)
