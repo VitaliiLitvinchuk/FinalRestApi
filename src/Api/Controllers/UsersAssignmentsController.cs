@@ -1,16 +1,18 @@
 using Api.Dtos.UsersAssignments;
 using Api.Modules.Errors;
 using Application.Common.Interfaces.Queries;
+using Application.UserAssignments.Commands;
 using Application.UserAssignments.Exceptions;
 using Domain.Assignments;
 using Domain.Users;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class UsersAssignmentsController(IUserAssignmentQueries userAssignmentQueries) : ControllerBase
+    public class UsersAssignmentsController(IUserAssignmentQueries userAssignmentQueries, ISender sender) : ControllerBase
     {
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<UserAssignmentDto>>> GetAll(CancellationToken cancellationToken)
@@ -34,6 +36,60 @@ namespace Api.Controllers
             return userAssignment.Match<ActionResult<UserAssignmentDto>>(
                 userAssignment => Ok(UserAssignmentDto.FromDomainModel(userAssignment)),
                 () => new UserAssignmentNotFoundException(userId1, assignmentId1).ToObjectResult()
+            );
+        }
+
+        [HttpPost("[action]")]
+        public async Task<ActionResult<UserAssignmentDto>> Create([FromForm] UserAssignmentCreateDto dto, CancellationToken cancellationToken)
+        {
+            var input = new CreateUserAssignmentCommand
+            {
+                UserId = dto.UserId,
+                AssignmentId = dto.AssignmentId
+            };
+
+            var result = await sender.Send(input, cancellationToken);
+
+            return result.Match<ActionResult<UserAssignmentDto>>(
+                userAssignment => Ok(UserAssignmentDto.FromDomainModel(userAssignment)),
+                e => e.ToObjectResult()
+            );
+        }
+
+        [HttpPut("[action]")]
+        public async Task<ActionResult<UserAssignmentDto>> Update([FromForm] UserAssignmentUpdateDto dto, CancellationToken cancellationToken)
+        {
+            var input = new UpdateUserAssignmentCommand
+            {
+                UserId = dto.UserId,
+                AssignmentId = dto.AssignmentId,
+                StatusId = dto.StatusId,
+                Score = dto.Score,
+                SubmittedAt = dto.SubmittedAt
+            };
+
+            var result = await sender.Send(input, cancellationToken);
+
+            return result.Match<ActionResult<UserAssignmentDto>>(
+                userAssignment => Ok(UserAssignmentDto.FromDomainModel(userAssignment)),
+                e => e.ToObjectResult()
+            );
+        }
+
+        [HttpDelete("[action]")]
+        public async Task<ActionResult> Delete([FromForm] UserAssignmentDeleteDto dto, CancellationToken cancellationToken)
+        {
+            var input = new DeleteUserAssignmentCommand
+            {
+                UserId = dto.UserId,
+                AssignmentId = dto.AssignmentId
+            };
+
+            var result = await sender.Send(input, cancellationToken);
+
+            return result.Match<ActionResult>(
+                userAssignment => Ok(UserAssignmentDto.FromDomainModel(userAssignment)),
+                e => e.ToObjectResult()
             );
         }
     }
