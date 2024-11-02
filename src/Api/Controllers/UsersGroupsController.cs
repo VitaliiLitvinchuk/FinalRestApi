@@ -57,7 +57,7 @@ namespace Api.Controllers
         }
 
         [HttpPut("[action]")]
-        public async Task<ActionResult<UserGroupDto>> Update([FromForm] UserGroupUpdateRoleDto dto, CancellationToken cancellationToken)
+        public async Task<ActionResult<UserGroupDto>> UpdateUserRole([FromForm] UserGroupUpdateRoleDto dto, CancellationToken cancellationToken)
         {
             var input = new UpdateRoleForUserGroupCommand
             {
