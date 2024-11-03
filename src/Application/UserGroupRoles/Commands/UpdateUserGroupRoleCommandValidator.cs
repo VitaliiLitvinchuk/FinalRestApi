@@ -10,7 +10,7 @@ public class UpdateUserGroupRoleCommandValidator : AbstractValidator<UpdateUserG
         RuleFor(x => x.Id)
             .NotEmpty();
         RuleFor(x => x.Name)
-            .NotEmpty()
+            .MinimumLength(1)
             .MaximumLength(255);
     }
 }

@@ -8,7 +8,7 @@ public class CreateUserGroupRoleCommandValidator : AbstractValidator<CreateUserG
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MinimumLength(5)
+            .MinimumLength(1)
             .MaximumLength(255);
     }
 }
