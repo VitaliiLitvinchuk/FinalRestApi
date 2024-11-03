@@ -16,7 +16,7 @@ public class User(UserId id, string firstName, string lastName, string email, st
     public UserRoleId UserRoleId { get; private set; } = userRoleId;
     public DateTime CreatedAt { get; } = createdAt;
 
-    public UserRole? UserRole { get; }
+    public UserRole? UserRole { get; private set; }
 
     public ICollection<Course> Courses { get; } = [];
     public ICollection<UserGroup> UserGroups { get; } = [];
@@ -35,5 +35,6 @@ public class User(UserId id, string firstName, string lastName, string email, st
     public void UpdateRole(UserRoleId userRoleId)
     {
         UserRoleId = userRoleId;
+        UserRole = null;
     }
 }

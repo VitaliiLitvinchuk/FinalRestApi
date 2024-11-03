@@ -13,7 +13,7 @@ public class UserGroup(UserId userId, GroupId groupId, UserGroupRoleId userGroup
 
     public User? User { get; }
     public Group? Group { get; }
-    public UserGroupRole? UserGroupRole { get; }
+    public UserGroupRole? UserGroupRole { get; private set; }
 
     public static UserGroup New(UserId userId, GroupId groupId, UserGroupRoleId userGroupRoleId, DateTime joinedAt)
         => new(userId, groupId, userGroupRoleId, joinedAt);
@@ -21,5 +21,6 @@ public class UserGroup(UserId userId, GroupId groupId, UserGroupRoleId userGroup
     public void UpdateRole(UserGroupRoleId userGroupRoleId)
     {
         UserGroupRoleId = userGroupRoleId;
+        UserGroupRole = null;
     }
 }

@@ -13,7 +13,7 @@ public class Assignment(AssignmentId id, CourseId courseId, string title, string
     public decimal MaxScore { get; private set; } = maxScore;
     public DateTime CreatedAt { get; } = createdAt;
 
-    public Course? Course { get; }
+    public Course? Course { get; private set; }
 
     public ICollection<UserAssignment> UserAssignments { get; } = [];
 
@@ -31,5 +31,6 @@ public class Assignment(AssignmentId id, CourseId courseId, string title, string
     public void UpdateCourse(CourseId courseId)
     {
         CourseId = courseId;
+        Course = null;
     }
 }

@@ -13,7 +13,7 @@ public class UserAssignment(AssignmentId assignmentId, UserId userId, StatusId s
     public decimal? Score { get; private set; } = score;
 
     public Assignment? Assignment { get; }
-    public Status? Status { get; }
+    public Status? Status { get; private set; }
     public User? User { get; }
 
     public static UserAssignment New(AssignmentId assignmentId, UserId userId, StatusId statusId, DateTime? submittedAt = null, decimal? score = null)
@@ -22,6 +22,7 @@ public class UserAssignment(AssignmentId assignmentId, UserId userId, StatusId s
     public void UpdateDetails(StatusId statusId, DateTime? submittedAt = null, decimal? score = null)
     {
         StatusId = statusId;
+        Status = null;
         SubmittedAt = submittedAt;
         Score = score;
     }

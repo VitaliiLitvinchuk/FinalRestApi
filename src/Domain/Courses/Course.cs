@@ -13,8 +13,8 @@ public class Course(CourseId id, string name, string description, UserId userId,
     public GroupId GroupId { get; private set; } = groupId;
     public DateTime CreatedAt { get; } = createdAt;
 
-    public User? User { get; }
-    public Group? Group { get; }
+    public User? User { get; private set; }
+    public Group? Group { get; private set; }
 
     public ICollection<Assignment> Assignments { get; } = [];
 
@@ -30,10 +30,12 @@ public class Course(CourseId id, string name, string description, UserId userId,
     public void UpdateGroup(GroupId groupId)
     {
         GroupId = groupId;
+        Group = null;
     }
 
     public void UpdateUser(UserId userId)
     {
         UserId = userId;
+        User = null;
     }
 }
