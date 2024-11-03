@@ -109,7 +109,7 @@ namespace Api.Controllers
         }
 
         [HttpDelete("[action]")]
-        public async Task<ActionResult<CourseDto>> Delete([FromForm] CourseDeleteDto dto, CancellationToken cancellationToken)
+        public async Task<ActionResult<CourseDto>> Delete([FromQuery] CourseDeleteDto dto, CancellationToken cancellationToken)
         {
             var input = new DeleteCourseCommand
             {

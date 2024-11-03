@@ -94,7 +94,7 @@ namespace Api.Controllers
         }
 
         [HttpDelete("[action]")]
-        public async Task<ActionResult> Delete([FromForm] UserDeleteDto dto, CancellationToken cancellationToken)
+        public async Task<ActionResult> Delete([FromQuery] UserDeleteDto dto, CancellationToken cancellationToken)
         {
             var input = new DeleteUserCommand
             {

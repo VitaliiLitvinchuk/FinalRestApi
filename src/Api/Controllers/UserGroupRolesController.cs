@@ -71,7 +71,7 @@ namespace Api.Controllers
         }
 
         [HttpDelete("[action]")]
-        public async Task<ActionResult<UserGroupRoleDto>> Delete([FromForm] UserGroupRoleDeleteDto dto, CancellationToken cancellationToken)
+        public async Task<ActionResult<UserGroupRoleDto>> Delete([FromQuery] UserGroupRoleDeleteDto dto, CancellationToken cancellationToken)
         {
             var input = new DeleteUserGroupRoleCommand
             {
