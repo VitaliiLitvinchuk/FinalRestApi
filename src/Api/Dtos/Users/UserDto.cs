@@ -12,5 +12,5 @@ public record UserDto(Guid Id, string FirstName, string LastName, string Email, 
 
     public static User ToDomainModel(UserDto userDto)
         => User.New(new(userDto.Id), userDto.FirstName, userDto.LastName, userDto.Email, userDto.GoogleId,
-        userDto.AvatarUrl, new(userDto.UserRole!.Id), DateTime.UtcNow);
+        userDto.AvatarUrl, new(userDto.UserRoleId), DateTime.UtcNow);
 }
