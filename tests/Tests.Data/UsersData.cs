@@ -6,5 +6,5 @@ namespace Tests.Data;
 public static class UsersData
 {
     public static User MainUser(UserRoleId userRoleId)
-        => User.New(UserId.New(), "Main", "User", "5j3pO@example.com", "googleId", "avatarUrl", userRoleId, DateTime.UtcNow);
+        => User.New(UserId.New(), "Main", "User", "random@example.com", "googleId", "avatarUrl", userRoleId, DateTime.UtcNow);
 }
