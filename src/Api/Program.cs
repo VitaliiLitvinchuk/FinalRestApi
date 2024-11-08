@@ -3,8 +3,6 @@ using Api.Injections;
 using Api.Modules;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
-await ConsoleExecutor.RunViaConsoleProcess("docker-compose", "up -d");
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -23,6 +21,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    await ConsoleExecutor.RunViaConsoleProcess("docker-compose", "up -d");
     app.UseSwagger();
     app.UseSwaggerUI();
 }
