@@ -10,6 +10,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers(options =>
 {
     options.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseParameterTransformer()));
+    options.Filters.Add<ValidationExceptionFilter>();
 });
 
 builder.Services.AddCors(options =>
