@@ -19,7 +19,7 @@ public class UserAssignmentRepository(ApplicationDbContext context) : IUserAssig
 
         await context.SaveChangesAsync(cancellation);
 
-        return userAssignment;
+        return (await GetByAssignmentIdAndUserIdAsync(userAssignment.UserId, userAssignment.AssignmentId, cancellation)).Match(x => x, () => throw new Exception("Could not create user assignment"));
     }
 
     public async Task<UserAssignment> Delete(UserAssignment userAssignment, CancellationToken cancellation)
@@ -114,6 +114,6 @@ public class UserAssignmentRepository(ApplicationDbContext context) : IUserAssig
 
         await context.SaveChangesAsync(cancellation);
 
-        return userAssignment;
+        return (await GetByAssignmentIdAndUserIdAsync(userAssignment.UserId, userAssignment.AssignmentId, cancellation)).Match(x => x, () => throw new Exception("Could not update user assignment"));
     }
 }

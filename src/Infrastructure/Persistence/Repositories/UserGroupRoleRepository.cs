@@ -16,7 +16,7 @@ public class UserGroupRoleRepository(ApplicationDbContext context) : IUserGroupR
 
         await context.SaveChangesAsync(cancellation);
 
-        return userGroupRole;
+        return (await GetByIdAsync(userGroupRole.Id, cancellation)).Match(x => x, () => throw new Exception("Could not create user group role"));
     }
 
     public async Task<UserGroupRole> Delete(UserGroupRole userGroupRole, CancellationToken cancellation)
@@ -74,6 +74,6 @@ public class UserGroupRoleRepository(ApplicationDbContext context) : IUserGroupR
 
         await context.SaveChangesAsync(cancellation);
 
-        return userGroupRole;
+        return (await GetByIdAsync(userGroupRole.Id, cancellation)).Match(x => x, () => throw new Exception("Could not update user group role"));
     }
 }

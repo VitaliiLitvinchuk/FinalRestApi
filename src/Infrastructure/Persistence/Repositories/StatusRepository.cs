@@ -16,7 +16,7 @@ public class StatusRepository(ApplicationDbContext context) : IStatusRepository,
 
         await context.SaveChangesAsync(cancellation);
 
-        return status;
+        return (await GetByIdAsync(status.Id, cancellation)).Match(x => x, () => throw new Exception("Could not create status"));
     }
 
     public async Task<Status> Delete(Status status, CancellationToken cancellation)
@@ -74,6 +74,6 @@ public class StatusRepository(ApplicationDbContext context) : IStatusRepository,
 
         await context.SaveChangesAsync(cancellation);
 
-        return status;
+        return (await GetByIdAsync(status.Id, cancellation)).Match(x => x, () => throw new Exception("Could not update status"));
     }
 }

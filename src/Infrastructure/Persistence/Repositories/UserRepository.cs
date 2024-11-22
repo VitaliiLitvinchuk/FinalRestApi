@@ -17,7 +17,7 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository, IUs
 
         await context.SaveChangesAsync(cancellation);
 
-        return user;
+        return (await GetByIdAsync(user.Id, cancellation)).Match(x => x, () => throw new Exception("Could not create user"));
     }
 
     public async Task<User> Delete(User user, CancellationToken cancellation)
@@ -92,6 +92,6 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository, IUs
 
         await context.SaveChangesAsync(cancellation);
 
-        return user;
+        return (await GetByIdAsync(user.Id, cancellation)).Match(x => x, () => throw new Exception("Could not update user"));
     }
 }

@@ -18,7 +18,7 @@ public class AssignmentRepository(ApplicationDbContext context) : IAssignmentRep
 
         await context.SaveChangesAsync(cancellation);
 
-        return assignment;
+        return (await GetByIdAsync(assignment.Id, cancellation)).Match(x => x, () => throw new Exception("Could not create assignment"));
     }
 
     public async Task<Assignment> Delete(Assignment assignment, CancellationToken cancellation)
@@ -57,7 +57,7 @@ public class AssignmentRepository(ApplicationDbContext context) : IAssignmentRep
 
         await context.SaveChangesAsync(cancellation);
 
-        return assignment;
+        return (await GetByIdAsync(assignment.Id, cancellation)).Match(x => x, () => throw new Exception("Could not update assignment"));
     }
 
     public async Task<IEnumerable<Assignment>> GetAllAsync(CancellationToken cancellation,

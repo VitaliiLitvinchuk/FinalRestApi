@@ -16,7 +16,10 @@ public class GroupRepository(ApplicationDbContext context) : IGroupRepository, I
 
         await context.SaveChangesAsync(cancellation);
 
-        return group;
+        return (await GetByIdAsync(group.Id, cancellation)).Match(
+            x => x,
+            () => throw new Exception("Could not create group")
+        );
     }
 
     public async Task<Group> Delete(Group group, CancellationToken cancellation)
@@ -65,6 +68,6 @@ public class GroupRepository(ApplicationDbContext context) : IGroupRepository, I
 
         await context.SaveChangesAsync(cancellation);
 
-        return group;
+        return (await GetByIdAsync(group.Id, cancellation)).Match(x => x, () => throw new Exception("Could not update group"));
     }
 }

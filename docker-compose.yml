@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: 12345
       POSTGRES_DB: FinalProject
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - final_project_db_data:/var/lib/postgresql/data
     networks:

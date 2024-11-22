@@ -17,7 +17,7 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<UserGroupDto>>> GetAll(CancellationToken cancellationToken)
         {
-            var userGroups = await userGroupQueries.GetAllAsync(cancellationToken);
+            var userGroups = await userGroupQueries.GetAllAsync(cancellationToken, includes: [x => x.User, x => x.Group, x => x.UserGroupRole]);
 
             return Ok(userGroups.Select(UserGroupDto.FromDomainModel).ToList());
         }

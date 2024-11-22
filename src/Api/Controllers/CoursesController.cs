@@ -16,7 +16,7 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<CourseDto>>> GetAll(CancellationToken cancellationToken)
         {
-            var courses = await courseQueries.GetAllAsync(cancellationToken);
+            var courses = await courseQueries.GetAllAsync(cancellationToken, includes: [x => x.User, x => x.Group]);
 
             return Ok(courses.Select(CourseDto.FromDomainModel).ToList());
         }

@@ -19,7 +19,7 @@ public class UserGroupRepository(ApplicationDbContext context) : IUserGroupRepos
 
         await context.SaveChangesAsync(cancellation);
 
-        return userGroup;
+        return (await GetByUserIdAndGroupIdAsync(userGroup.UserId, userGroup.GroupId, cancellation)).Match(x => x, () => throw new Exception("Could not create user group"));
     }
 
     public async Task<UserGroup> Delete(UserGroup userGroup, CancellationToken cancellation)
@@ -114,6 +114,6 @@ public class UserGroupRepository(ApplicationDbContext context) : IUserGroupRepos
 
         await context.SaveChangesAsync(cancellation);
 
-        return userGroup;
+        return (await GetByUserIdAndGroupIdAsync(userGroup.UserId, userGroup.GroupId, cancellation)).Match(x => x, () => throw new Exception("Could not update user group"));
     }
 }

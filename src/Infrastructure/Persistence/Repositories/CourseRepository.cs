@@ -18,7 +18,10 @@ public class CourseRepository(ApplicationDbContext context) : ICourseRepository,
 
         await context.SaveChangesAsync(cancellation);
 
-        return course;
+        return (await GetByIdAsync(course.Id, cancellation)).Match(
+            x => x,
+            () => throw new Exception("Could not create course")
+        );
     }
 
     public async Task<Course> Delete(Course course, CancellationToken cancellation)
@@ -100,6 +103,6 @@ public class CourseRepository(ApplicationDbContext context) : ICourseRepository,
 
         await context.SaveChangesAsync(cancellation);
 
-        return course;
+        return (await GetByIdAsync(course.Id, cancellation)).Match(x => x, () => throw new Exception("Could not update course"));
     }
 }

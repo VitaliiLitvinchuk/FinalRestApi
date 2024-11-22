@@ -16,7 +16,7 @@ public class UserRoleRepository(ApplicationDbContext context) : IUserRoleReposit
 
         await context.SaveChangesAsync(cancellation);
 
-        return userRole;
+        return (await GetByIdAsync(userRole.Id, cancellation)).Match(x => x, () => throw new Exception("Could not create user role"));
     }
 
     public async Task<UserRole> Delete(UserRole userRole, CancellationToken cancellation)
@@ -74,6 +74,6 @@ public class UserRoleRepository(ApplicationDbContext context) : IUserRoleReposit
 
         await context.SaveChangesAsync(cancellation);
 
-        return userRole;
+        return (await GetByIdAsync(userRole.Id, cancellation)).Match(x => x, () => throw new Exception("Could not update user role"));
     }
 }
