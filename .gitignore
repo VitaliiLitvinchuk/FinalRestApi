@@ -44,12 +44,12 @@ TestResults/
 *.cache
 
 ## Ignore sln and csproj files
-*.suo
-*.csproj
-*.vbproj
-*.vcxproj
-*.vcxproj.filters
-*.sln
+#*.suo
+#*.csproj
+#*.vbproj
+#*.vcxproj
+#*.vcxproj.filters
+#*.sln
 
 ## Ignore src and test directories (only if you want to ignore the whole directory)
 #src/
